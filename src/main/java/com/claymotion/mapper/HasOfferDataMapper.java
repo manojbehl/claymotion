@@ -15,8 +15,9 @@ public class HasOfferDataMapper implements RowMapper<HasOfferData>{
 		// TODO Auto-generated method stub
 		HasOfferData hasOfferData = new HasOfferData();
 		
-		hasOfferData.setOfferId(rs.getInt("offer_id"));
-		hasOfferData.setAdvertiser(rs.getInt("advertiser"));
+		hasOfferData.setOfferId(rs.getString("offer_id"));
+		hasOfferData.setId(rs.getInt("id"));
+		hasOfferData.setAdvertiser(rs.getString("advertiser"));
 		hasOfferData.setAndroidPackage(rs.getString("android_package"));
 		hasOfferData.setAppUrl(rs.getString("app_url"));
 		hasOfferData.setCurrency(rs.getString("currency"));
@@ -39,19 +40,25 @@ public class HasOfferDataMapper implements RowMapper<HasOfferData>{
 		
 		CreativeDomain creativeDomain = new CreativeDomain();
 		
-		creativeDomain.setAndroidPackage(rs.getString("package"));
-		creativeDomain.setId(rs.getString("creative_id"));
-		creativeDomain.setDescription(rs.getString("creative_description"));
+//		creativeDomain.setAndroidPackage(rs.getString("package"));
+		creativeDomain.setOfferId(rs.getInt("id"));
+		creativeDomain.setId(rs.getInt("creative_id"));
+		
+//		creativeDomain.setDescription(rs.getString("creative_description"));
 		creativeDomain.setFilename(rs.getString("file_name"));
 		creativeDomain.setHeight(rs.getInt("height"));
-		creativeDomain.setIs_active(rs.getInt("is_active") ==1 ? true :false);
+		creativeDomain.setWidth(rs.getInt("width"));
 		creativeDomain.setMimetype(rs.getString("mime_type"));
-		creativeDomain.setPartner_id(rs.getString("partner_id"));
-		creativeDomain.setTitle(rs.getString("title"));
-		creativeDomain.setUploadPath(rs.getString("upload_path"));
-		creativeDomain.setVersion(rs.getInt("version"));
+		
+		
+//		creativeDomain.setIs_active(rs.getInt("is_active") ==1 ? true :false);
+		creativeDomain.setMimetype(rs.getString("mime_type"));
+//		creativeDomain.setPartner_id(rs.getString("partner_id"));
+//		creativeDomain.setTitle(rs.getString("title"));
+//		creativeDomain.setUploadPath(rs.getString("upload_path"));
+//		creativeDomain.setVersion(rs.getInt("version"));
 		creativeDomain.setWidthHeight(rs.getString("width_height"));
-		creativeDomain.setCountryCode(rs.getString("cr_country"));
+//		creativeDomain.setCountryCode(rs.getString("cr_country"));
 		
 		
 		hasOfferData.getListOfCreativeDomains().add(creativeDomain);

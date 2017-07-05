@@ -1,15 +1,9 @@
 package com.claymotion.advertiser;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.Calendar;
 import java.util.List;
-import java.util.Map;
 
-import com.claymotion.webservice.client.WebServiceClient;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 public class AppNext {
 
@@ -38,6 +32,9 @@ public class AppNext {
 	private String storeRating;
 	private String storeDownloads;
 	private String appSize;
+	private String campaignGoal;
+	private String buttonText;
+	
 	public String getTitle() {
 		return title;
 	}
@@ -210,14 +207,95 @@ public class AppNext {
 //		hash = 7 * hash + this.getCompaignId().hashCode();
 		return hash;
     }
+    
+public boolean isInServiceHours() throws Exception {
+		
+		int currentHour,currentMin,startHour,startMin,stopHour,stopMin;
+		
+			String startTime = "00:10";// getCheckinSession().getConfiguration().getString("KioskStartTime1").substring(0,5);
+			String stopTime = "04:00";// getCheckinSession().getConfiguration().getString("KioskStopTime1").substring(0,5);
+			
+			Calendar currentCal = Calendar.getInstance();//  checkinSession.getCurrentLocationDateTime().toGregorianCalendar();			
+			try{
+				currentHour = currentCal.get(Calendar.HOUR_OF_DAY);
+				currentMin = currentCal.get(Calendar.MINUTE);
+				startHour = Integer.parseInt(startTime.substring(0, 2));
+				startMin = Integer.parseInt(startTime.substring(3, 5));
+				stopHour = Integer.parseInt(stopTime.substring(0, 2));
+				stopMin = Integer.parseInt(stopTime.substring(3, 5));
+			}
+			catch(NumberFormatException e) {
+				e.printStackTrace();
+				
+				return false;
+			}
+			System.err.println("currentHour:"+ currentHour);
+			System.err.println("currentMin:"+ currentMin);
+
+			System.err.println("startHour:"+ startHour);
+			System.err.println("startMin:"+ startMin);
+
+			System.err.println("stopHour:"+ stopHour);
+			System.err.println("currentMin:"+ currentMin);
+
+			
+			if (currentHour == startHour){
+				if (currentMin >= startMin) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+			else if (currentHour == stopHour){
+				if (currentMin < stopMin) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+			else if (currentHour > startHour && currentHour < stopHour){
+				return true;
+			}
+			else {
+				return false;
+			}			
+		}
+
 
 
 	
-	public static void main(String[] args) {
-		WebServiceClient webServiceClient = WebServiceClient.getSharedInstance();
+	public static void main(String[] args) throws Exception {
+		AppNext test = new AppNext();
+		System.err.println(test.isInServiceHours());
+		/*WebServiceClient webServiceClient = WebServiceClient.getSharedInstance();
 		Map<String ,String> hashMap = new HashMap<String, String>();
 		hashMap.put("Content-Type", "application/json");
 		
+		try {
+			Object apps238 = webServiceClient.executeGetMethod("https://admin.appnext.com/offerWallApi.aspx?id=5a5c5ce6-d955-4a9c-8fa2-27c04fc68e13&cnt=200&type=json&ip=59.91.219.238",
+					Object.class, hashMap);
+			LinkedHashMap linkedHashMap = (LinkedHashMap)apps238;
+			
+			Collection collections = linkedHashMap.values();
+			for (Iterator iterator = collections.iterator(); iterator.hasNext();) {
+				Object object = (Object) iterator.next();
+				List listOfObjects =  (ArrayList)object;
+				for (Iterator iterator2 = listOfObjects.iterator(); iterator2.hasNext();) {
+					Object object1 = (Object) iterator2.next();
+					LinkedHashMap<String, Object> appNextValues = (LinkedHashMap<String, Object>)object1;
+					System.err.println(appNextValues.get("title"));
+					System.err.println(appNextValues.get("desc"));
+					System.err.println(object1.getClass());
+				}
+				
+				
+			}
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		*/
 /*		try {
 			Map<String, List<Apps>> apps = (Map<String, List<Apps>>)webServiceClient.executeGetMethod("https://admin.appnext.com/offerWallApi.aspx?id=5a5c5ce6-d955-4a9c-8fa2-27c04fc68e13&cnt=200&type=json&ip=59.91.219.238",
 					Map.class, hashMap);
@@ -236,7 +314,7 @@ public class AppNext {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}*/
+		}
 		try {
 			AppNextList apps238 = (AppNextList)webServiceClient.executeGetMethod("https://admin.appnext.com/offerWallApi.aspx?id=5a5c5ce6-d955-4a9c-8fa2-27c04fc68e13&cnt=200&type=json&ip=59.91.219.238",
 					AppNextList.class, hashMap);
@@ -244,7 +322,7 @@ public class AppNext {
 			AppNextList apps202 = (AppNextList)webServiceClient.executeGetMethod("https://admin.appnext.com/offerWallApi.aspx?id=5a5c5ce6-d955-4a9c-8fa2-27c04fc68e13&cnt=200&type=json&ip=79.91.219.202",
 					AppNextList.class, hashMap);
 
-			/*for (Iterator iterator = apps202.getApps().iterator(); iterator.hasNext();) {
+			for (Iterator iterator = apps202.getApps().iterator(); iterator.hasNext();) {
 				Apps appValue = (Apps) iterator.next();
 				System.err.println(appValue.getAndroidPackage());
 
@@ -255,7 +333,7 @@ public class AppNext {
 				Apps appValue = (Apps) iterator.next();
 				System.err.println(appValue.getAndroidPackage());
 
-			}*/
+			}
 
 			List<AppNext> appsToAdd = new ArrayList<AppNext>();
 			List<AppNext> appsToPause = new ArrayList<AppNext>();
@@ -267,9 +345,9 @@ public class AppNext {
 						appsToAdd.add(appValue);
 				}
 				
-/*				System.err.println(appValue.getAndroidPackage());
+				System.err.println(appValue.getAndroidPackage());
 				System.err.println(apps238.getApps().contains(appValue));
-*/				
+				
 			}
 			
 			for (Iterator iterator = apps238.getApps().iterator(); iterator.hasNext();) {
@@ -279,9 +357,9 @@ public class AppNext {
 						appsToPause.add(appValue);
 				}
 				
-/*				System.err.println(appValue.getAndroidPackage());
+				System.err.println(appValue.getAndroidPackage());
 				System.err.println(apps238.getApps().contains(appValue));
-*/				
+				
 			}
 			
 			System.err.println(" Apps to Add ------------------------------------------------");
@@ -301,7 +379,7 @@ public class AppNext {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+		*/
 		
 	}
 	public List<String> getTargetedDevices() {
@@ -327,6 +405,18 @@ public class AppNext {
 	}
 	public void setCampaignType(String campaignType) {
 		this.campaignType = campaignType;
+	}
+	public String getCampaignGoal() {
+		return campaignGoal;
+	}
+	public void setCampaignGoal(String campaignGoal) {
+		this.campaignGoal = campaignGoal;
+	}
+	public String getButtonText() {
+		return buttonText;
+	}
+	public void setButtonText(String buttonText) {
+		this.buttonText = buttonText;
 	}
 	
 }

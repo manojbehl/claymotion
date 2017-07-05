@@ -28,22 +28,25 @@ public class HasOfferConstant {
 	
 	
 	
-	public static String ADVERTISER_ID = "advertiser_id";
+	public static String ADVERTISER_ID = "advertiser";
 	public static String CONVERSION_CAP = "conversion_cap";
 	public static String DEFAULT_PAYOUT = "default_payout";
 	public static String DESCRIPTION = "description";
 	public static String EXPIRATION_DATE = "expiration_date";
 	public static String IS_PRIVATE = "is_private";
 	public static String IS_SEO_FRIENDLY_301 = "is_seo_friendly_301";
-	public static String NAME = "name";
+	public static String NAME = "title";
 	public static String NOTE = "note";
-	public static String OFFER_URL = "offer_url";
-	public static String PREVIEW_URL = "preview_url";
+	public static String OFFER_URL = "url";
+	public static String PREVIEW_URL = "url_preview";
 	public static String REQUIRE_APPROVAL = "require_approval";
 	public static String REQUIRE_TERMS_AND_CONDITIONS = "require_terms_and_conditions";
 	public static String REVENUE_TYPE = "revenue_type";
 	public static String MAX_PAYOUT = "max_payout";
 	public static String STATUS = "status";
+	public static String COUNTRIES = "countries";
+	public static String CATEGORIES= "categories";
+	
 	
 	
 	public static final Integer CREATE_METHOD =1;
@@ -73,7 +76,8 @@ public class HasOfferConstant {
 	}
 
 	public static String generateHasOfferCreateURL(Map<String, Object> map) {
-		String hasOfferURL = generateCommonURL("offer", "create");
+//		String hasOfferURL = generateCommonURL("offer", "create");
+		String hasOfferURL= "http://api.dynamyn.affise.com/2.1/admin/offer?";
 		if (map != null && map.size() > 0) {
 			Iterator<String> keySetIterator = map.keySet().iterator();
 			StringBuffer value = new StringBuffer();
@@ -104,7 +108,9 @@ public class HasOfferConstant {
 	
 	
 	public static String generateHasOfferUpdateURL(Map<String, Object> map, String id) {
-		String hasOfferURL = generateCommonURL("offer", "update");
+//		String hasOfferURL = generateCommonURL("offer", "update");
+
+		String hasOfferURL= "http://api.dynamyn.affise.com/2.1/admin/offer?";
 		logger.info("map object:"+ map.size());
 		if (map != null && map.size() > 0) {
 			Iterator<String> keySetIterator = map.keySet().iterator();

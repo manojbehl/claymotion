@@ -18,18 +18,20 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.claymotion.advertiser.GlispaList;
+import com.claymotion.advertiser.batch.AdvertiserExecution;
 import com.claymotion.advertiser.batch.AppNextExecution;
 import com.claymotion.advertiser.batch.GlispaExecution;
+import com.claymotion.advertiser.batch.IronSourceExecution;
 import com.claymotion.advertiser.batch.OfferCreationProcessing;
+import com.claymotion.api.response.Offer;
 import com.claymotion.dao.ClayMotionDAO;
 import com.claymotion.hasoffer.HasOfferConstant;
 import com.claymotion.hasoffer.HasOfferUtility;
 import com.claymotion.hasoffer.domain.HasOfferData;
-import com.claymotion.hasoffer.domain.Offer;
+import com.claymotion.response.APIResponse;
+import com.claymotion.response.OfferRequest;
+import com.claymotion.response.OfferResponse;
 import com.claymotion.service.IClayMotionService;
-import com.claymotion.util.APIResponse;
-import com.claymotion.util.OfferRequest;
-import com.claymotion.util.OfferResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Controller
@@ -46,6 +48,9 @@ public class HasOfferController {
 	
 	@Autowired
 	IClayMotionService clayMotionService;
+	
+	@Autowired
+	IronSourceExecution ironSourceExecution;
 
 
 	@RequestMapping(value = "/executeTestService", method = RequestMethod.GET)
@@ -71,6 +76,9 @@ public class HasOfferController {
 	
 	@Autowired
 	ClayMotionDAO clayMotionDAO;
+	
+	@Autowired
+	AdvertiserExecution advertiserExecution;
 
 	@RequestMapping(value = "/executeTest", method = RequestMethod.GET)
 	@ResponseBody
@@ -143,6 +151,19 @@ public class HasOfferController {
 		return apiResponse;
 	}
 
+	@RequestMapping(value = "/insertAdvertiser", method = RequestMethod.GET)
+	@ResponseBody
+	public void insertAdvertiser() throws Exception {
+	
+		advertiserExecution.actionPerformed();
+	}
+	
+	@RequestMapping(value = "/offerCreationIronSource", method = RequestMethod.GET)
+	@ResponseBody
+	public void offerCreationIronSource() throws Exception {
+	
+		ironSourceExecution.actionPerformed();
+	}
 	
 	@RequestMapping(value = "/offerCreation", method = RequestMethod.GET)
 	@ResponseBody

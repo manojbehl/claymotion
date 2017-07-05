@@ -8,7 +8,7 @@ public class HasOfferData {
 	private String name;
 	private String description;
 	private String category;
-	private int advertiser;
+	private String advertiser;
 	private String androidPackage;
 	private String revenueType;
 	private double revenueRate;
@@ -18,7 +18,7 @@ public class HasOfferData {
 	private String currency;
 	private String appUrl;
 	private int id;
-	private int offerId;
+	private String offerId;
 	private String status;
 	private int doesLinkGenerate;
 	private String developer;
@@ -50,10 +50,10 @@ public class HasOfferData {
 	public void setCategory(String category) {
 		this.category = category;
 	}
-	public int getAdvertiser() {
+	public String getAdvertiser() {
 		return advertiser;
 	}
-	public void setAdvertiser(int advertiser) {
+	public void setAdvertiser(String advertiser) {
 		this.advertiser = advertiser;
 	}
 	public String getAndroidPackage() {
@@ -110,10 +110,10 @@ public class HasOfferData {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public int getOfferId() {
+	public String getOfferId() {
 		return offerId;
 	}
-	public void setOfferId(int offerId) {
+	public void setOfferId(String offerId) {
 		this.offerId = offerId;
 	}
 	public String getStatus() {

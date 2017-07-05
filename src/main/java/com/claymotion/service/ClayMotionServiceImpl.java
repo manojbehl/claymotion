@@ -17,11 +17,12 @@ import org.springframework.util.StringUtils;
 
 import com.claymotion.advertiser.batch.OfferCreationProcessing;
 import com.claymotion.dao.IClayMotionDAO;
+import com.claymotion.hasoffer.domain.CountryIPList;
 import com.claymotion.hasoffer.domain.CreativeDomain;
 import com.claymotion.hasoffer.domain.HasOfferData;
-import com.claymotion.util.CreativeResponse;
-import com.claymotion.util.OfferRequest;
-import com.claymotion.util.OfferResponse;
+import com.claymotion.response.CreativeResponse;
+import com.claymotion.response.OfferRequest;
+import com.claymotion.response.OfferResponse;
 
 @Component
 public class ClayMotionServiceImpl implements IClayMotionService{
@@ -31,6 +32,23 @@ public class ClayMotionServiceImpl implements IClayMotionService{
 	
 	@Autowired
 	IClayMotionDAO clayMotionDAO;
+	
+	Map<String, String> mapForCountry = null;
+	
+	
+	public Map<String, String> getCountryAndIPAddress(){
+		if(mapForCountry == null){
+			List<CountryIPList> countryIPLists = clayMotionDAO.getCountryIPList();
+			mapForCountry = new HashMap<String, String>();
+			
+			for (Iterator iterator = countryIPLists.iterator(); iterator.hasNext();) {
+				CountryIPList countryIPList = (CountryIPList) iterator.next();
+				mapForCountry.put(countryIPList.getCountry(), countryIPList.getIpAddress());
+			}
+		}
+
+		return mapForCountry;
+	}
 	
 	public List<OfferResponse> listOfOffer(OfferRequest offerRequest){
 		
@@ -44,18 +62,20 @@ public class ClayMotionServiceImpl implements IClayMotionService{
 		logger.info("listOfHasOfferDatas hasoffer data :"+ listOfHasOfferDatas.size());
 		
 		
-		Map<String, HasOfferData> map = new HashMap<String, HasOfferData>();
+	Map<String, HasOfferData> map = new HashMap<String, HasOfferData>();
 		
 		for (Iterator iterator = listOfHasOfferDatas.iterator(); iterator
 				.hasNext();) {
 			HasOfferData hasOfferData = (HasOfferData) iterator.next();
 			
-			String key = hasOfferData.getAndroidPackage() + hasOfferData.getAffiliateId() ;
+//			String key = hasOfferData.getAndroidPackage() + hasOfferData.getAffiliateId() ;
+			
+			String key = ""+ hasOfferData.getId() + ":" +  hasOfferData.getAffiliateId();
 			
 			if(map.get(key) == null){
-				if( hasOfferData.getListOfCreativeDomains().get(0).getAndroidPackage() == null){
+				/*if( hasOfferData.getListOfCreativeDomains().get(0).getAndroidPackage() == null){
 					hasOfferData.getListOfCreativeDomains().clear();
-				}
+				}*/
 				map.put(key, hasOfferData);
 			}else{
 				HasOfferData offerData = map.get(key);
@@ -66,7 +86,7 @@ public class ClayMotionServiceImpl implements IClayMotionService{
 						.hasNext();) {
 					CreativeDomain creativeDomain = (CreativeDomain) iterator2
 							.next();
-					if(creativeDomain.getAndroidPackage() != null){
+					if(creativeDomain.getFilename() != null){
 						offerData.getListOfCreativeDomains().add(creativeDomain);
 					}
 				}
@@ -74,7 +94,7 @@ public class ClayMotionServiceImpl implements IClayMotionService{
 			}
 		}
 		
-		logger.info("map values :"+ map.size());
+//		logger.info("map values :"+ map.size());
 		
 		Collection<HasOfferData> collection = map.values();
 		for (Iterator iterator = collection.iterator(); iterator.hasNext();) {
@@ -96,6 +116,7 @@ public class ClayMotionServiceImpl implements IClayMotionService{
 			
 			offerResponse.setName(hasOfferData.getName());
 			offerResponse.setOfferId(hasOfferData.getOfferId());
+			offerResponse.setId(hasOfferData.getId());
 			offerResponse.setPackageName(hasOfferData.getAndroidPackage());
 			offerResponse.setVersion(hasOfferData.getVersion());
 			offerResponse.setReward(hasOfferData.getRevenueRate());
@@ -120,7 +141,16 @@ public class ClayMotionServiceImpl implements IClayMotionService{
 				CreativeDomain creativeDomain = (CreativeDomain) iterator2
 						.next();
 				
-				BeanUtils.copyProperties(creativeDomain, creativeResponse);
+				if(creativeDomain.getFilename() == null)
+					continue;
+				
+				creativeResponse.setFilename(creativeDomain.getFilename());
+				creativeResponse.setHeight(creativeDomain.getHeight());
+				creativeResponse.setWidth(creativeDomain.getWidth());
+				creativeResponse.setMimetype(creativeDomain.getMimetype());
+				creativeResponse.setWidthHeight(creativeDomain.getWidthHeight());
+				creativeResponse.setSize(creativeDomain.getSize());
+//				BeanUtils.copyProperties(creativeDomain, creativeResponse);
 				
 				listOfCreativeResponses.add(creativeResponse);
 			}

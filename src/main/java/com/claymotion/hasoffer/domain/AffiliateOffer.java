@@ -3,8 +3,8 @@ package com.claymotion.hasoffer.domain;
 public class AffiliateOffer {
 	
 	private int id;
-	private int offer_id;
-	private String affiliate_id;
+	private String offer_id;
+	private int affiliate_id;
 	private String impression_pixel;
 	private String click_url;
 	public int getId() {
@@ -13,16 +13,16 @@ public class AffiliateOffer {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public int getOffer_id() {
+	public String getOffer_id() {
 		return offer_id;
 	}
-	public void setOffer_id(int offer_id) {
+	public void setOffer_id(String offer_id) {
 		this.offer_id = offer_id;
 	}
-	public String getAffiliate_id() {
+	public int getAffiliate_id() {
 		return affiliate_id;
 	}
-	public void setAffiliate_id(String affiliate_id) {
+	public void setAffiliate_id(int affiliate_id) {
 		this.affiliate_id = affiliate_id;
 	}
 	public String getImpression_pixel() {

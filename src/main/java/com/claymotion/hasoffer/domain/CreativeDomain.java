@@ -1,7 +1,7 @@
 package com.claymotion.hasoffer.domain;
 
 public class CreativeDomain {
-	private String id;
+	private int id;
 	private int width;
 	private int height;
 	private String title;
@@ -10,17 +10,19 @@ public class CreativeDomain {
 	private String partner_id;
 	private boolean is_active;
 	private String mimetype;
-	private long size;
+	private String size;
 	private String filename;
 	private String uploadPath;
 	private int version;
 	private String widthHeight;
 	private String countryCode;
 	
-	public String getId() {
+	private int offerId;
+	
+	public int getId() {
 		return id;
 	}
-	public void setId(String id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 	public int getWidth() {
@@ -66,10 +68,10 @@ public class CreativeDomain {
 	public void setMimetype(String mimetype) {
 		this.mimetype = mimetype;
 	}
-	public long getSize() {
+	public String getSize() {
 		return size;
 	}
-	public void setSize(long size) {
+	public void setSize(String size) {
 		this.size = size;
 	}
 	public String getFilename() {
@@ -107,6 +109,12 @@ public class CreativeDomain {
 	}
 	public void setCountryCode(String countryCode) {
 		this.countryCode = countryCode;
+	}
+	public int getOfferId() {
+		return offerId;
+	}
+	public void setOfferId(int offerId) {
+		this.offerId = offerId;
 	}
 
 }

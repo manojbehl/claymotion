@@ -13,7 +13,7 @@ public class AdvertiserMapper implements RowMapper<Advertiser>{
 		// TODO Auto-generated method stub
 		Advertiser advertiser = new Advertiser();
 		
-		advertiser.setId(resultSet.getInt("advertiser_id"));
+		advertiser.setId(resultSet.getString("id"));
 		advertiser.setName(resultSet.getString("advertiser_name"));
 		advertiser.setPriority(resultSet.getInt("advertiser_priority"));
 		

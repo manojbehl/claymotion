@@ -2,7 +2,7 @@ package com.claymotion.advertiser;
 
 public class Creative {
 	
-	private String _id;
+	private int id;
 	private int width;
 	private int height;
 	private String title;
@@ -11,16 +11,13 @@ public class Creative {
 	private String partner_id;
 	private boolean is_active;
 	private String mimetype;
-	private long size;
+	private String size;
 	private String filename;
 	private String uploadPath;
 	private int __v;
-	public String get_id() {
-		return _id;
-	}
-	public void set_id(String _id) {
-		this._id = _id;
-	}
+	private int offerId;
+	
+
 	public int getWidth() {
 		return width;
 	}
@@ -64,10 +61,10 @@ public class Creative {
 		this.is_active = is_active;
 	}
 	
-	public long getSize() {
+	public String getSize() {
 		return size;
 	}
-	public void setSize(long size) {
+	public void setSize(String size) {
 		this.size = size;
 	}
 	
@@ -94,6 +91,18 @@ public class Creative {
 	}
 	public void setFilename(String filename) {
 		this.filename = filename;
+	}
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public int getOfferId() {
+		return offerId;
+	}
+	public void setOfferId(int offerId) {
+		this.offerId = offerId;
 	}
 	
 	

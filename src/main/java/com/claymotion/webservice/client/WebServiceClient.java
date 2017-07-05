@@ -10,7 +10,10 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
@@ -35,15 +38,25 @@ public class WebServiceClient {
 
 	private RestTemplate getRestTemplate() {
 		if (restTemplate == null) {
-			restTemplate = new RestTemplate();
+			SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+			factory.setBufferRequestBody(false);
+			restTemplate = new RestTemplate(factory);
 
 			MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
+			
+			StringHttpMessageConverter stringHttpMessageConverter = new StringHttpMessageConverter();
+			
+			FormHttpMessageConverter formHttpMessageConverter = new FormHttpMessageConverter();
+			
+			
 
 			// MappingJacksonHttpMessageConverter
 			// mappingJacksonHttpMessageConverter = new
 			// MappingJacksonHttpMessageConverter();
 			List<HttpMessageConverter<?>> messageConverters = new ArrayList<HttpMessageConverter<?>>();
 			messageConverters.add(mappingJackson2HttpMessageConverter);
+			messageConverters.add(stringHttpMessageConverter);
+			messageConverters.add(formHttpMessageConverter);
 			restTemplate.setMessageConverters(messageConverters);
 		}
 		System.err.println(restTemplate);
@@ -83,6 +96,8 @@ public class WebServiceClient {
 
 		ResponseEntity responseEntity = getRestTemplate().postForEntity(uri,
 				getEntityWithObjectOrHeader(requestObject, hashMap), responseTypeClass);
+		
+		System.err.println(responseEntity.getBody());
 
 		return responseEntity.getBody();
 	}
@@ -101,7 +116,7 @@ public class WebServiceClient {
 	}
 
 	public Object executeDeleteMethod(String url, Object requestObject,
-			Class responseTypeClass, Map<String, String> headers) throws Exception {
+			Class responseTypeClass, Map<String, String> headers ) throws Exception {
 
 		URI uri = new URI(url);
 
@@ -134,7 +149,7 @@ public class WebServiceClient {
 		}else if (requestObject == null && headers != null){
 			httpEntity = new HttpEntity(headers);
 		}
-		
+		System.err.println(httpEntity.getBody());
 		return httpEntity;
 	}
 

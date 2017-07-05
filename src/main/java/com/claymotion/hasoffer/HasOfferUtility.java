@@ -1,6 +1,17 @@
 package com.claymotion.hasoffer;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -13,12 +24,16 @@ import java.util.Map;
 import org.apache.commons.codec.net.URLCodec;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriUtils;
 
 import com.claymotion.advertiser.batch.GlispaExecution;
+import com.claymotion.api.response.Offer;
 import com.claymotion.hasoffer.domain.AdvertiserRawData;
-import com.claymotion.hasoffer.domain.Offer;
+import com.claymotion.hasoffer.domain.AffiseCreative;
+import com.claymotion.hasoffer.domain.Category;
+import com.claymotion.util.AffiseOfferUtility;
 import com.claymotion.util.Utility;
 import com.claymotion.webservice.client.HttpClientService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -162,7 +177,7 @@ public class HasOfferUtility {
 		return hashMap;
 	}
 
-	public Map<String, Object>  populateOfferCreationFields(Offer offerData){
+	public Map<String, Object>  populateOfferCreationFields(Offer offerData) throws Exception{
 		
 		SimpleDateFormat  simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		
@@ -173,36 +188,105 @@ public class HasOfferUtility {
 		
 		Map<String, Object> hashMap = new HashMap<String, Object>();
 		
-		// TODO - Need to use App Next Advertiser id
-		hashMap.put(HasOfferConstant.ADVERTISER_ID, offerData.getAdvertiser_id());
+	// TODO - Need to use App Next Advertiser id
+		hashMap.put(HasOfferConstant.ADVERTISER_ID, offerData.getAdvertiser());
 		
-		hashMap.put(HasOfferConstant.CONVERSION_CAP, 0);
+//		hashMap.put(HasOfferConstant.CONVERSION_CAP, 0);
 		
-		hashMap.put(HasOfferConstant.DEFAULT_PAYOUT, offerData.getDefault_payout());
+		//hashMap.put(HasOfferConstant.DEFAULT_PAYOUT, offerData.getDefault_payout());
 		
 			
-			hashMap.put(HasOfferConstant.DESCRIPTION, offerData.getDescription());
+		hashMap.put(HasOfferConstant.DESCRIPTION, offerData.getDescription());
 		
 		
 		
-		hashMap.put(HasOfferConstant.EXPIRATION_DATE, offerData.getExpiration_date());
+		//hashMap.put(HasOfferConstant.EXPIRATION_DATE, offerData.getExpiration_date());
 		
-		hashMap.put(HasOfferConstant.IS_PRIVATE, 0);
-		hashMap.put(HasOfferConstant.IS_SEO_FRIENDLY_301, 0);
-		System.err.println(" offerData.getName() :"+ offerData.getName());
-		hashMap.put(HasOfferConstant.NAME,offerData.getName());
-		hashMap.put(HasOfferConstant.NOTE, offerData.getNote());
-		hashMap.put(HasOfferConstant.OFFER_URL, offerData.getOffer_url());
+//		hashMap.put(HasOfferConstant.IS_PRIVATE, 0);
+//		hashMap.put(HasOfferConstant.IS_SEO_FRIENDLY_301, 0);
+		System.err.println(" offerData.getName() :"+ offerData.getTitle());
+		hashMap.put(HasOfferConstant.NAME,offerData.getTitle());
+//		hashMap.put(HasOfferConstant.NOTE, offerData.getNotes());
+		hashMap.put(HasOfferConstant.OFFER_URL, offerData.getUrl());
 //		https%3A%2F%2Fadmin.appnext.com%2FappLink.aspx%3Fb%3D143949%26e%3D160480%26q%3D%7Btransaction_id%7D%26subid%3D%7Baffiliate_id%7D
 		hashMap.put(HasOfferConstant.PREVIEW_URL, offerData.getPreview_url());
-		hashMap.put(HasOfferConstant.REQUIRE_APPROVAL, 0);
-		hashMap.put(HasOfferConstant.REQUIRE_TERMS_AND_CONDITIONS, 0);
+		
+//		hashMap.put(HasOfferConstant.REQUIRE_APPROVAL, 0);
+//		hashMap.put(HasOfferConstant.REQUIRE_TERMS_AND_CONDITIONS, 0);
 //		hashMap.put("revenue_type", "cpc");
-		hashMap.put(HasOfferConstant.REVENUE_TYPE, "cpa_flat");
-		hashMap.put(HasOfferConstant.MAX_PAYOUT, offerData.getMax_payout());
+//		hashMap.put(HasOfferConstant.REVENUE_TYPE, "cpa_flat");
+//		hashMap.put(HasOfferConstant.MAX_PAYOUT, offerData.getMax_payout());
 		hashMap.put(HasOfferConstant.STATUS, "active");
+		
+		hashMap.put("payments[0][total]", ""+ offerData.getTotal_cap());
+		
+		hashMap.put("payments[0][currency]", "USD");
+
+		hashMap.put("payments[0][type]", "fixed");
+		
+		int j = 0;
+		for (Iterator iterator = ((List)offerData.getCreatives()).iterator(); iterator.hasNext();) {
+			AffiseCreative type = (AffiseCreative) iterator.next();
+			try{
+				System.err.println("File Name :"+ type.getFile_name());
+				FileSystemResource fileSystemResource = new FileSystemResource(type.getFile_name());
+				System.err.println("fileSystemResoitrce:"+ fileSystemResource);
+				hashMap.put("creativeFiles["+ j + "]", fileSystemResource);
+			}catch(Exception ex){
+				ex.printStackTrace();
+			}
+			j++;
+		}
+		
+		
+//			URL url = new URL("https://cx.ssacdn.com/image/fetch/f_jpg,f_auto,q_80/https://supersonicads-a.akamaihd.net/banners/c_2615373_19014_5.png");
+			
+//			File file =  new File(url.getFile());
+//			FileInputStream fis = new FileInputStream(file);
+		
+//			hashMap.put("creativeFiles[0]", file);
+		
+
+//		hashMap.put("payments[0][type]", "fixed");
+
+
+		
+		for(int i=0; i< offerData.getCountries().size(); i++){
+			
+			hashMap.put("countries["+i+"]", offerData.getCountries().get(i));
+		}
+		
+		List<Category> listOfCategories = new ArrayList<Category>();
+		try {
+			 listOfCategories =  AffiseOfferUtility.getSharedInstance().getCategoryList();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		for(int i=0; i< offerData.getCategories().size(); i++){
+			
+			String categoryId = getCategoryId(listOfCategories, (String)offerData.getCategories().get(i));
+			
+			hashMap.put("categories["+i+"]", categoryId);
+		}
+
+//		hashMap.put(HasOfferConstant.CATEGORIES, offerData.getCategories().get(0));
+
 
 		return hashMap;
+	}
+	
+	
+	private String getCategoryId(List<Category> listOfCategories, String categoryName){
+		
+		for (Iterator iterator = listOfCategories.iterator(); iterator.hasNext();) {
+			Category category = (Category) iterator.next();
+			if(category.getTitle().equalsIgnoreCase(categoryName))
+				return category.getId();
+		}
+		
+		return null;
 	}
 	
 	public List<Offer> getAllOfferList(Map<String, Object> hashMap) throws Exception{
@@ -247,14 +331,14 @@ public class HasOfferUtility {
 		logger.info("APPS from Advertiser");
 		for (Iterator iterator = appFromAPI.iterator(); iterator.hasNext();) {
 			Offer offer = (Offer) iterator.next();
-			logger.info(offer.getName() + "   " + offer.getPreview_url());
+			logger.info(offer.getTitle() + "   " + offer.getPreview_url());
 			logger.info("----------------------------------------------------");
 		}
 
 		logger.info("APPS Alreday Present");
 		for (Iterator iterator = appFromHasoffer.iterator(); iterator.hasNext();) {
 			Offer offer = (Offer) iterator.next();
-			logger.info(offer.getName() + "   " + offer.getPreview_url());
+			logger.info(offer.getTitle() + "   " + offer.getPreview_url());
 			logger.info("----------------------------------------------------");
 		}
 
@@ -294,7 +378,7 @@ public class HasOfferUtility {
 	
 	private void uploadCreatives(Offer originalOffer, List<Offer> listOfApis){
 
-		for (Iterator iterator = listOfApis.iterator(); iterator.hasNext();) {
+/*		for (Iterator iterator = listOfApis.iterator(); iterator.hasNext();) {
 			Offer offer = (Offer) iterator.next();
 			if(offer.getName().equals(originalOffer.getName()) && offer.getPreview_url().equalsIgnoreCase(originalOffer.getPreview_url())){
 				logger.info(" upload creative offer creative :"+ offer.getCreatives());
@@ -306,7 +390,7 @@ public class HasOfferUtility {
 				break;
 //				return offer.getCreatives();
 			}
-		}
+		}*/
 		
 	}
 	
@@ -329,6 +413,17 @@ public class HasOfferUtility {
 		
 		return appsToUpdate;
 	}
+	
+	
+	public static void main(String[] args) {
+		FileSystemResource fis = new FileSystemResource("https\\cx.ssacdn.com\\image\\fetch\\f_jpg,f_auto,q_80\\https:\\supersonicads-a.akamaihd.net\\banners\\5199557.50.82010.jpg");
+		System.err.println(fis.getPath());
+		System.err.println(fis.getFilename());
+		System.err.println(fis.getFile());
+	}
+
+
+	
 
 	
 	

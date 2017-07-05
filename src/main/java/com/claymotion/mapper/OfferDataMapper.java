@@ -13,8 +13,9 @@ public class OfferDataMapper implements RowMapper<HasOfferData>{
 		// TODO Auto-generated method stub
 		HasOfferData hasOfferData = new HasOfferData();
 		
-		hasOfferData.setOfferId(resultSet.getInt("offer_id"));
+		hasOfferData.setOfferId(resultSet.getString("offer_id"));
 		hasOfferData.setName(resultSet.getString("name"));
+		hasOfferData.setId(resultSet.getInt("id"));
 		
 		return hasOfferData;
 	}

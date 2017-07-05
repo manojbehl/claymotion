@@ -17,13 +17,15 @@ import org.springframework.stereotype.Component;
 import com.claymotion.advertiser.AppNextList;
 import com.claymotion.advertiser.Glispa;
 import com.claymotion.advertiser.GlispaList;
+import com.claymotion.api.response.Offer;
 import com.claymotion.dao.IClayMotionDAO;
 import com.claymotion.hasoffer.HasOfferConstant;
 import com.claymotion.hasoffer.HasOfferUtility;
 import com.claymotion.hasoffer.domain.AdvertiserCreative;
 import com.claymotion.hasoffer.domain.AdvertiserRawData;
-import com.claymotion.hasoffer.domain.Offer;
+import com.claymotion.service.IClayMotionService;
 import com.claymotion.transformer.DataTransformer;
+import com.claymotion.util.AffiseOfferUtility;
 import com.claymotion.webservice.client.WebServiceClient;
 
 @Component
@@ -31,7 +33,7 @@ public class GlispaExecution {
 
 	private static String URL = "http://feed.platform.glispa.com/native-feed/b04006ac-af2f-4b37-8326-5ed7498877b7/app?countries=";
 
-	private static int GLIPSA_NEXT_ID = 295;
+	private static String GLIPSA_NEXT_ID = "58a3115ac524bdb5108b45c9";
 	
 	WebServiceClient webServiceClient = WebServiceClient.getSharedInstance();
 
@@ -43,6 +45,9 @@ public class GlispaExecution {
 	
 	@Autowired
 	IClayMotionDAO clayMotionDAO;
+	
+	@Autowired
+	IClayMotionService clayMotionService;
 	
 	Logger logger = Logger.getLogger(GlispaExecution.class);
 
@@ -56,7 +61,7 @@ public class GlispaExecution {
 		Map<String, String> hashMap = new HashMap<String, String>();
 		hashMap.put("Content-Type", "application/json");
 		
-		Map<String, String> mapForCountry = getIPAddress();
+		Map<String, String> mapForCountry = clayMotionService.getCountryAndIPAddress();
 		
 		Set<String> listOfIPAddress = mapForCountry.keySet();
 		JSONObject responseObject =  null;
@@ -67,7 +72,7 @@ public class GlispaExecution {
 
 		logger.info("Fetching all Offer for  Glispa Advertiser ");
 
-		List<Offer>  listOfOffers = hasOfferUtility.getAllOfferList(hashMapForAdvertiser);
+		List<Offer>  listOfOffers = AffiseOfferUtility.getSharedInstance().getListOfAlloffers(GLIPSA_NEXT_ID);
 		
 		logger.info(" total Offer Present :"+ listOfOffers.size());
 
@@ -91,13 +96,13 @@ public class GlispaExecution {
 				logger.info("Converting Data in offer data :"+ listOfGlispaRecords.size());
 
 
-				List<Offer> listOfRawData = dataTransformer.convertIntoOfferData(listOfGlispaRecords, GLIPSA_NEXT_ID);
+				List<Offer> listOfRawData = dataTransformer.convertIntoOfferData(listOfGlispaRecords, GLIPSA_NEXT_ID, countryCode);
 				
-				for (Iterator iterator2 = listOfRawData.iterator(); iterator2
+				/*for (Iterator iterator2 = listOfRawData.iterator(); iterator2
 						.hasNext();) {
 					Offer offer = (Offer) iterator2.next();
 					logger.info("for offer :"+ offer.getId() + "  creatives :"+ offer.getImages());
-				}
+				}*/
 
 				logger.info(">>>>>>>>>>>>>>>>>>> Offer Converted >>>>>>>>>>>>>>");
 
@@ -119,73 +124,30 @@ public class GlispaExecution {
 
 				logger.info("offers to update:"+ appsToUpdate.size());
 				
-				for (Iterator iterator2 = appsToUpdate.iterator(); iterator2
+				/*for (Iterator iterator2 = appsToUpdate.iterator(); iterator2
 						.hasNext();) {
 					Offer offer = (Offer) iterator2.next();
 					logger.info("for offer :"+ offer.getId() + "  creatives :"+ offer.getImages());
 					
-				}
+				}*/
 
 
 				for (Iterator iterator2 = appsToPause.iterator(); iterator2.hasNext();) {
 					
 					Offer offer = (Offer) iterator2.next();
-					offer.setStatus("paused");
 					
-					Map<String, Object> updateHashMap = new HashMap<String, Object>();
-					updateHashMap.put("status", "paused");
+					System.err.println(offer.getTitle());
 					
-					logger.info("offer to paused :"+ offer.getId());
-					
-					Object[] objArray = new Object[]{updateHashMap, ""+offer.getId()};
-				
-					try{
-						JSONObject jsonObject = hasOfferUtility.executeHasOfferAPI(HasOfferConstant.UPDATE_METHOD, objArray);
-					}catch(Exception ex){
-						logger.error("Error while Executing hasOffer API for Offer Pause :"+ ex.getMessage(), ex);
-					}
-					
-					try{
-						if(!clayMotionDAO.doesCreativeExists(offer.getId()))
-							processCreatives(offer, countryCode);
-					}catch(Exception ex){
-						logger.error("Error while Executing hasOffer API for setting Advertiser Creative :"+ ex.getMessage(), ex);
-						
-					}
-					
+					AffiseOfferUtility.getSharedInstance().updateOfferStatus(offer.getOffer_id(), "stopped");
 					
 				}
 				
 				for (Iterator iterator2 = appsToUpdate.iterator(); iterator2.hasNext();) {
 					
 					Offer offer = (Offer) iterator2.next();
-					offer.setStatus("active");
+					System.err.println(offer.getTitle());
 					
-					Map<String, Object> updateHashMap = new HashMap<String, Object>();
-					updateHashMap.put("status", "active");
-					updateHashMap.put("default_payout", offer.getDefault_payout());
-					updateHashMap.put("offer_url", offer.getOffer_url());
-					
-					
-					
-					Object[] objArray = new Object[]{updateHashMap, ""+offer.getId()};
-				
-					try{
-						JSONObject jsonObject = hasOfferUtility.executeHasOfferAPI(HasOfferConstant.UPDATE_METHOD, objArray);
-					}catch(Exception ex){
-						logger.error("Error while Executing hasOffer API for Offer Update :"+ ex.getMessage(), ex);
-					}
-					
-					try{
-						logger.info("offer id :"+ offer.getId());
-						boolean doesCreativeExisst= clayMotionDAO.doesCreativeExists(offer.getId());
-						logger.info(" value for if creative exists :"+ doesCreativeExisst);
-						if(!clayMotionDAO.doesCreativeExists(offer.getId()))
-							processCreatives(offer, countryCode);
-					}catch(Exception ex){
-						logger.error("Error while Executing hasOffer API for setting Advertiser Creative :"+ ex.getMessage(), ex);
-						
-					}
+					AffiseOfferUtility.getSharedInstance().updateOfferStatus(offer.getOffer_id(), "active");
 					
 					
 				}
@@ -194,29 +156,20 @@ public class GlispaExecution {
 					
 					
 					Offer offer = (Offer) iterator2.next();
-
-					offer.setStatus("active");
+					System.err.println(offer.getTitle());
 					
-					System.err.println(" offer name is :"+ offer.getName());
 
-					Map<String, Object> fieldMap = hasOfferUtility.populateOfferCreationFields(offer);
-					JSONObject  jsonObject =  null;
+					JSONObject jsonObject = null;
 					try{
-						jsonObject = hasOfferUtility.executeHasOfferAPI(HasOfferConstant.CREATE_METHOD, fieldMap);
-						
+						Map<String, Object> fieldMap = hasOfferUtility.populateOfferCreationFields(offer);
+						 AffiseOfferUtility.getSharedInstance().createOffer(fieldMap);
+//						break;
 					}catch(Exception ex){
 						logger.error("Error while Executing hasOffer API for Offer Create :"+ ex.getMessage());
+//						break;
 						
 					}
-					
-					try{
-						processCreatives(offer, countryCode);
-					}catch(Exception ex){
-						logger.error("Error while Executing hasOffer API for setting Advertiser Creative :"+ ex.getMessage(), ex);
-						
-					}
-//					return jsonObject;
-					responseObject = jsonObject;
+
 					
 				}
 
@@ -242,7 +195,7 @@ public class GlispaExecution {
 		
 		for (Iterator iterator = totalList.iterator(); iterator.hasNext();) {
 			Offer offer = (Offer) iterator.next();
-			if(offer.getName().contains(country))
+			if(offer.getCountries().contains(country))
 				filteredList.add(offer);
 		}
 		
@@ -252,83 +205,7 @@ public class GlispaExecution {
 
 	
 	
-	private Map<String, String> getIPAddress() {
-		
-		Map<String, String> mapForCountry = new HashMap<String, String>();
-		
-		mapForCountry.put("IN", "59.91.219.238");
-		mapForCountry.put("UA", "5.255.160.0");
-		mapForCountry.put("RU", "5.144.64.0");
-		mapForCountry.put("HK", "14.102.240.0");
-		mapForCountry.put("SG", "39.109.128.0");
-		mapForCountry.put("PH", "49.157.0.0");
-		mapForCountry.put("TH", "49.48.0.0");
-		mapForCountry.put("MY", "42.188.0.0");
-		mapForCountry.put("ID", "110.232.64.0");
-		mapForCountry.put("VN", "61.11.224.0");
-		
-		
 
-		return mapForCountry;
-	}
-	
-	private void processCreatives(Offer offer, String countryCode){
-		
-		List<AdvertiserCreative> listOfAdvertiserCreatives = new ArrayList<AdvertiserCreative>();
-		logger.info(" offer cratives :"+ offer.getImages());
-		if(offer.getImages() != null){
-			HashMap<String, List<String>> linkedHashMap = (HashMap<String, List<String>>)offer.getImages();
-			
-			List<String> strings = linkedHashMap.get("564x294");
-
-			logger.info("  stirngs are :"+ strings);
-			if(strings != null && strings.size() > 0){
-				String value = strings.get(0);
-				AdvertiserCreative advertiserCreative = new AdvertiserCreative();
-				advertiserCreative.setOfferId(offer.getId());
-				advertiserCreative.setKey("564x294");
-				advertiserCreative.setValue(value);
-				advertiserCreative.setCountryCode(countryCode);
-
-				listOfAdvertiserCreatives.add(advertiserCreative);
-				
-			}
-			
-			if(offer.getIcon() != null){
-				AdvertiserCreative advertiserCreative = new AdvertiserCreative();
-				advertiserCreative.setOfferId(offer.getId());
-				advertiserCreative.setKey("default");
-				advertiserCreative.setValue(offer.getIcon());
-				advertiserCreative.setCountryCode(countryCode);
-
-				listOfAdvertiserCreatives.add(advertiserCreative);
-			}
-			
-			
-			/*Iterator<String> itr = linkedHashMap.keySet().iterator();
-			AdvertiserCreative advertiserCreative = null;
-			while(itr.hasNext()){
-				String key = itr.next();
-				advertiserCreative = new AdvertiserCreative();
-				advertiserCreative.setOfferId(offer.getId());
-				advertiserCreative.setKey(key);
-				advertiserCreative.setValue(linkedHashMap.get(key));
-
-				listOfAdvertiserCreatives.add(advertiserCreative);
-			}
-*/
-			
-			clayMotionDAO.addAdvertiserCreative(listOfAdvertiserCreatives);
-			
-			AdvertiserRawData advertiserRawData = new AdvertiserRawData();
-			advertiserRawData.setOfferId(offer.getId());
-			advertiserRawData.setCategory(offer.getCategory());
-			
-			clayMotionDAO.addRawData(advertiserRawData);
-			
-		}
-		
-	}
 	
 	public static void main(String[] args) throws Exception {
 		

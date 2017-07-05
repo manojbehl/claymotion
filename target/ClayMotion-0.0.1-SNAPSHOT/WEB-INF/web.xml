@@ -31,6 +31,10 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
             <param-name>contextConfigLocation</param-name>
             <param-value>/WEB-INF/mvc-config.xml</param-value>
         </init-param>
+        <init-param>
+            <param-name>sendfileSize</param-name>
+            <param-value>-1</param-value>
+        </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
 
