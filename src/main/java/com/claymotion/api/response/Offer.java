@@ -104,6 +104,8 @@ public class Offer {
 	
 	private double revenueRate;
 	private String currency;
+	
+	private String created_at;
 
 	public int getId() {
 		return id;
@@ -606,6 +608,14 @@ public class Offer {
 
 	public void setCurrency(String currency) {
 		this.currency = currency;
+	}
+
+	public String getCreated_at() {
+		return created_at;
+	}
+
+	public void setCreated_at(String created_at) {
+		this.created_at = created_at;
 	}
 	
 	
